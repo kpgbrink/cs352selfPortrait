@@ -1,69 +1,93 @@
 /*
- * gasket v2: draw a Sierpinski gasket by drawing lots of dots,
+ * kenDoll v2: draw a Sierpinski kenDoll by drawing lots of dots,
  * where each is the average of the previous and a random vertex
  * For CS352, Calvin College Computer Science
  *
  * Harry Plantinga -- January 2011
  */
 
-var gasket = {
+var kenDoll = {
   radius:	0.005,				// dot radius
 }
 var vertex = new Array();
 
-$(document).ready(function () { gasket.init(); });
+$(document).ready(function () { kenDoll.init(); });
 
-gasket.init = function () {  
-  gasket.canvas  = $('#canvas1')[0];
-  gasket.cx = gasket.canvas.getContext('2d');	// get the drawing canvas
-  gasket.cx.fillStyle = 'rgba(250,0,0,0.7)';
+kenDoll.init = function () {  
+  kenDoll.canvas  = $('#canvas1')[0];
+  kenDoll.cx = kenDoll.canvas.getContext('2d');	// get the drawing canvas
+    
+  var midX = 255;
+  var offSetX = 15;
+  kenDoll.eyes = {left: {x:midX-offSetX - 34, y: 171, offSet: {centerX:434,centerY:232,x:0,y:0}}, right : {x:midX+offSetX, y:171, offSet:{centerX:503,centerY:232,x:0,y:0}}};
+   
+    
+  kenDoll.letsGoPartyAudioElement = document.createElement('audio');
+  kenDoll.letsGoPartyAudioElement.setAttribute('src', './letsGoParty.wav');
+  
+    
+  kenDoll.cx.fillStyle = 'rgba(250,0,0,0.7)';
 
-  vertex[0] = Vector.create([0,0]);		// the vertices of our triangle
-  vertex[1] = Vector.create([1,0]);
-  vertex[2] = Vector.create([0.5,1]);
 
   // By default (0,0) is the upper left and canvas.width, canvas.height 
   // is the lower right. We'll add a matrix multiplication to the state
   // to change the coordinate system so that the central part of the canvas
-  // (a 300x300 square) is (0,0) to (1,1), with (0,0) in the lower left.
-  gasket.cx.setTransform(300,0,0,-300,75,321);
 
-  // bind functions to events, button clicks
-  $('#erasebutton').bind('click', gasket.erase);
-  $('#drawbutton').bind('click', gasket.draw);
-  $('#slider1').bind('change', gasket.slider);
+  // bind functions to events, button clicks]
+  $('#letsGoParty').bind('click', kenDoll.letsGoParty);
+  $('#slider1').bind('change', kenDoll.slider);
+ 
+  setInterval(kenDoll.draw, 10);
+  $('#messages').prepend("Aren't I beautiful?");
+    
+  
+  kenDoll.mouse = {x:0, y:0};
+  $("body").mousemove(function(e) {
+    kenDoll.mouse.x = e.pageX;
+    kenDoll.mouse.y = e.pageY;
+    console.log(kenDoll.mouse);
+    
+})
 }
 
-gasket.draw = function(ev) {
-  // pick a random point along the bottom edge
-  p = Vector.create([Math.random(),0]);
-  $('#messages').prepend("Starting point: (" + p.e(1) + "," + p.e(2) + ")<br>");
-
-  for (i=0; i<$('#slider1').val(); i++) {
-    v = Math.floor(Math.random() * 3);		// random integer from 0 to 2
-    p = (vertex[v].add(p)).multiply(0.5);	// average p with chosen vertex
-    if (i<5) {
-      $('#messages').prepend("Avg with vertex["+v+"]->["+p.e(1)+","+p.e(2)+"]<br>");
-    }
-
-    gasket.circle(p.e(1), p.e(2), gasket.radius);
-  }
+kenDoll.drawEyes = function() {
+    kenDoll.cx.fillStyle = 'rgba(0,0,0,1)';
+    kenDoll.drawEye(kenDoll.eyes.right);
+    kenDoll.drawEye(kenDoll.eyes.left);
 }
 
-// draw a filled circle
-gasket.circle = function(x, y, radius) {
-  gasket.cx.beginPath();
-  gasket.cx.arc(x, y, radius, 0, 2*Math.PI, false);
-  gasket.cx.fill();
+kenDoll.drawEye = function (eye) {
+    // logic for eye position
+    // get x and y offset from posotion
+    var xOffset = eye.offSet.centerX - kenDoll.mouse.x;
+    var yOffset = eye.offSet.centerY - kenDoll.mouse.y;
+    var lowerOffset = 90;
+    kenDoll.cx.beginPath();
+    kenDoll.cx.arc(eye.x - xOffset/lowerOffset, eye.y - yOffset/lowerOffset, 3.5, 0, Math.PI*2, true);
+    kenDoll.cx.closePath();
+    kenDoll.cx.fill();
+}
+
+kenDoll.draw = function(ev) {
+    kenDoll.erase();
+    kenDoll.drawEyes();
+    
+}
+
+kenDoll.letsGoParty = function(ev) {
+    $('#messages').prepend("Let's go party... ");
+    kenDoll.cx.fillText("Let's Go Party!", 10, 50);
+    kenDoll.letsGoPartyAudioElement.play();
+    console.log(kenDoll.letsGoPartyAudioElement);
 }
 
 // erase canvas and message box
-gasket.erase = function(ev) {
-  gasket.cx.clearRect(-1,-1,3,3);
-    $('#messages').html("");
+kenDoll.erase = function(ev) {
+    console.log('width', kenDoll.canvas.width);
+  kenDoll.cx.clearRect(0,0,kenDoll.canvas.width, kenDoll.canvas.height);
 }
 
 // update the message below the slider with its setting
-gasket.slider = function(ev) {
+kenDoll.slider = function(ev) {
   $('#pointcount').text($('#slider1').val());
 }
