@@ -43,6 +43,7 @@ kenDoll.init = function () {
     
   
   kenDoll.mouse = {x:0, y:0, canvasX:0, canvasY:0};
+    
   $("body").mousemove(function(e) {
     kenDoll.mouse.x = e.pageX;
     kenDoll.mouse.y = e.pageY;
@@ -52,30 +53,58 @@ kenDoll.init = function () {
     kenDoll.mouse.canvasY = e.pageY - rect.top;
   });
   
+  kenDoll.lazerTimer = kenDoll.lazerTimerStart = 40;
+  kenDoll.mouseClick = false;
+  $(kenDoll.canvas).click(function(e) {
+     kenDoll.mouseClick = true;
+  });
 }
 
 kenDoll.drawEyes = function() {
-    kenDoll.cx.fillStyle = 'rgba(0,0,0,1)';
     kenDoll.drawEye(kenDoll.eyes.right);
     kenDoll.drawEye(kenDoll.eyes.left);
+    
+    if (kenDoll.mouseClick) {
+        kenDoll.lazerTimer = kenDoll.lazerTimerStart;
+    }
+    if (kenDoll.lazerTimer) {
+        kenDoll.lazerTimer--;
+    }
 }
 
 kenDoll.drawEye = function (eye) {
     // logic for eye position
     // get x and y offset from posotion
-    var lowerOffset = 90;
     var xPos = eye.centerX - ( - kenDoll.mouse.canvasX / 50);
-    var yPos = eye.centerY - ( - kenDoll.mouse.canvasY / lowerOffset);
+    var yPos = eye.centerY - ( - kenDoll.mouse.canvasY / 90);
+    
+    kenDoll.cx.fillStyle = 'rgba(0,0,0,1)';
     kenDoll.cx.beginPath();
     kenDoll.cx.arc(xPos, yPos, 3.5, 0, Math.PI*2, true);
     kenDoll.cx.closePath();
     kenDoll.cx.fill();
+    
+    if (kenDoll.lazerTimer) {
+        kenDoll.cx.strokeStyle = 'rgba(255,0,0,1)';
+        kenDoll.cx.lineWidth=2;
+        kenDoll.drawLazer({x:xPos,y:yPos}, {x:kenDoll.mouse.canvasX,y:kenDoll.mouse.canvasY});
+        kenDoll.cx.strokeStyle = 'rgba(255,0,0,.5)';
+        kenDoll.cx.lineWidth=10;
+        kenDoll.drawLazer({x:xPos,y:yPos}, {x:kenDoll.mouse.canvasX,y:kenDoll.mouse.canvasY});
+    }
+}
+
+kenDoll.drawLazer = function (pos1, pos2) {
+    kenDoll.cx.beginPath();
+    kenDoll.cx.moveTo(pos1.x, pos1.y);
+    kenDoll.cx.lineTo(pos2.x, pos2.y);
+    kenDoll.cx.stroke();
 }
 
 kenDoll.draw = function(ev) {
     kenDoll.erase();
     kenDoll.drawEyes();
-    
+    kenDoll.mouseClick = false;
 }
 
 kenDoll.letsGoParty = function(ev) {
