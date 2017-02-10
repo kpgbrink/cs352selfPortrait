@@ -17,9 +17,10 @@ kenDoll.init = function () {
   kenDoll.canvas  = $('#canvas1')[0];
   kenDoll.cx = kenDoll.canvas.getContext('2d');	// get the drawing canvas
     
-  var midX = 255;
+  var midX = 251;
   var offSetX = 15;
-  kenDoll.eyes = {left: {x:midX-offSetX - 34, y: 171, offSet: {centerX:434,centerY:232,x:0,y:0}}, right : {x:midX+offSetX, y:171, offSet:{centerX:503,centerY:232,x:0,y:0}}};
+  var offSetY = 170;
+  kenDoll.eyes = {left: {centerX:midX-offSetX - 34, centerY: offSetY}, right : {centerX:midX+offSetX, centerY:offSetY}};
    
     
   kenDoll.letsGoPartyAudioElement = document.createElement('audio');
@@ -41,13 +42,16 @@ kenDoll.init = function () {
   $('#messages').prepend("Aren't I beautiful?");
     
   
-  kenDoll.mouse = {x:0, y:0};
+  kenDoll.mouse = {x:0, y:0, canvasX:0, canvasY:0};
   $("body").mousemove(function(e) {
     kenDoll.mouse.x = e.pageX;
     kenDoll.mouse.y = e.pageY;
-    console.log(kenDoll.mouse);
-    
-})
+    // http://stackoverflow.com/a/18053642
+    var rect = kenDoll.canvas.getBoundingClientRect();
+    kenDoll.mouse.canvasX = e.pageX - rect.left;
+    kenDoll.mouse.canvasY = e.pageY - rect.top;
+  });
+  
 }
 
 kenDoll.drawEyes = function() {
@@ -59,11 +63,11 @@ kenDoll.drawEyes = function() {
 kenDoll.drawEye = function (eye) {
     // logic for eye position
     // get x and y offset from posotion
-    var xOffset = eye.offSet.centerX - kenDoll.mouse.x;
-    var yOffset = eye.offSet.centerY - kenDoll.mouse.y;
     var lowerOffset = 90;
+    var xPos = eye.centerX - ( - kenDoll.mouse.canvasX / 50);
+    var yPos = eye.centerY - ( - kenDoll.mouse.canvasY / lowerOffset);
     kenDoll.cx.beginPath();
-    kenDoll.cx.arc(eye.x - xOffset/lowerOffset, eye.y - yOffset/lowerOffset, 3.5, 0, Math.PI*2, true);
+    kenDoll.cx.arc(xPos, yPos, 3.5, 0, Math.PI*2, true);
     kenDoll.cx.closePath();
     kenDoll.cx.fill();
 }
