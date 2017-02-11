@@ -6,14 +6,27 @@
  * Harry Plantinga -- January 2011
  */
 
-var kenDoll = {
-  radius:	0.005,				// dot radius
+var kenDoll = {};
+
+function randNum(min, max) {
+  return Math.random() * (max - min) + min;
 }
-var vertex = new Array();
+
+// http://stackoverflow.com/a/22237671
+function getRndColor() {
+    var r = 255*Math.random()|0,
+        g = 255*Math.random()|0,
+        b = 255*Math.random()|0;
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+
+function getRndColorHex() {
+    return Math.floor(Math.random()*16777215).toString(16);
+}
 
 $(document).ready(function () { kenDoll.init(); });
 
-kenDoll.init = function () {  
+kenDoll.init = function () {
   kenDoll.canvas  = $('#canvas1')[0];
   kenDoll.cx = kenDoll.canvas.getContext('2d');	// get the drawing canvas
     
@@ -53,11 +66,26 @@ kenDoll.init = function () {
     kenDoll.mouse.canvasY = e.pageY - rect.top;
   });
   
-  kenDoll.lazerTimer = kenDoll.lazerTimerStart = 40;
+  // set timers
+  kenDoll.partyTimer = 0;
+  kenDoll.partyTimerStart = 280;
+  kenDoll.lazerTimer = 0;
+  kenDoll.lazerTimerStart = 40;
+  kenDoll.partyMessages = [];
+  
   kenDoll.mouseClick = false;
   $(kenDoll.canvas).click(function(e) {
      kenDoll.mouseClick = true;
   });
+}
+
+
+
+kenDoll.draw = function(ev) {
+    kenDoll.erase();
+    kenDoll.drawEyes();
+    kenDoll.handleParty();
+    kenDoll.mouseClick = false;
 }
 
 kenDoll.drawEyes = function() {
@@ -101,22 +129,64 @@ kenDoll.drawLazer = function (pos1, pos2) {
     kenDoll.cx.stroke();
 }
 
-kenDoll.draw = function(ev) {
-    kenDoll.erase();
-    kenDoll.drawEyes();
-    kenDoll.mouseClick = false;
+kenDoll.handleParty = function() {
+    if (kenDoll.partyTimer) {
+        kenDoll.partyTimer--;
+        kenDoll.drawParty();
+    } else {
+        kenDoll.partyMessages = [];
+    }
+}
+
+kenDoll.partyBackground = function () {
+    console.log('background change');
+    if (kenDoll.partyTimer % 50 == 0 ) {
+        console.log('yeay');
+        var color = getRndColorHex();
+        $('#messages').prepend("Change the party color to " + color + "... ");
+        $('body').css('background-color', '#' + color);
+    }
+}
+
+kenDoll.drawParty = function() {
+    // Party Background
+    kenDoll.partyBackground();
+    
+    
+    // Party messages
+    if (kenDoll.partyMessages.length < 12) {
+        kenDoll.cx.beginPath();
+        kenDoll.partyMessages.push({pos: {x: randNum(-10, 400), y: randNum(-10, 400)}, speed: {x: randNum(-5,5), y: randNum(-5,5)}, size: randNum(1,10), sizeChange: randNum(0,4), color: getRndColor()});
+    }
+    
+    for(partyMessage of kenDoll.partyMessages) {
+        kenDoll.drawPartyMessage(partyMessage);
+        partyMessage.size += partyMessage.sizeChange;
+        partyMessage.pos.x += partyMessage.speed.x;
+        partyMessage.pos.y += partyMessage.speed.y;
+    }
+}
+
+kenDoll.drawPartyMessage = function (message) {
+    kenDoll.cx.font = `${message.size}px Arial`;
+    kenDoll.cx.fillStyle = message.color;
+    //console.log(kenDoll.cx.fillStyle);
+    kenDoll.cx.beginPath();
+    kenDoll.cx.fillText("Let's go party", message.pos.x, message.pos.y);
+    
 }
 
 kenDoll.letsGoParty = function(ev) {
-    $('#messages').prepend("Let's go party... ");
-    kenDoll.cx.fillText("Let's Go Party!", 10, 50);
     kenDoll.letsGoPartyAudioElement.play();
-    console.log(kenDoll.letsGoPartyAudioElement);
+    if (!kenDoll.partyTimer) {
+        $('#messages').prepend("Let's go party... ");
+        kenDoll.partyTimer = kenDoll.partyTimerStart;
+    }
 }
 
 // erase canvas and message box
 kenDoll.erase = function(ev) {
-    console.log('width', kenDoll.canvas.width);
+    //console.log('width', kenDoll.canvas.width);
   kenDoll.cx.clearRect(0,0,kenDoll.canvas.width, kenDoll.canvas.height);
 }
 
