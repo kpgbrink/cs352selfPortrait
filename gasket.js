@@ -49,7 +49,8 @@ kenDoll.init = function () {
 
   // bind functions to events, button clicks]
   $('#letsGoParty').bind('click', kenDoll.letsGoParty);
-  $('#slider1').bind('change', kenDoll.slider);
+  kenDoll.happiness = 10;
+  $('#sliderHappiness').bind('change', kenDoll.slider);
  
   setInterval(kenDoll.draw, 10);
   $('#messages').prepend("Aren't I beautiful?");
@@ -83,6 +84,7 @@ kenDoll.init = function () {
 
 kenDoll.draw = function(ev) {
     kenDoll.erase();
+    kenDoll.drawHappiness();
     kenDoll.drawEyes();
     kenDoll.handleParty();
     kenDoll.mouseClick = false;
@@ -190,7 +192,21 @@ kenDoll.erase = function(ev) {
   kenDoll.cx.clearRect(0,0,kenDoll.canvas.width, kenDoll.canvas.height);
 }
 
-// update the message below the slider with its setting
+kenDoll.drawHappiness = function() {
+    kenDoll.happiness = $('#sliderHappiness').val();
+    var addAngle = (Math.PI/2) * ((5000-kenDoll.happiness) / 5000);
+    // first draw a smiley
+    kenDoll.cx.beginPath();
+    kenDoll.cx.lineWidth = 8;
+    kenDoll.cx.arc(kenDoll.canvas.width / 2 + 12, 190, // position
+                   50, // radius
+                   0 + addAngle, // start angle
+                   Math.PI - addAngle); // end angle
+    kenDoll.cx.stroke();
+}
+
+// Change ken's happiness.
 kenDoll.slider = function(ev) {
-  $('#pointcount').text($('#slider1').val());
+  
+  $('#pointcount').text(kenDoll.happiness);
 }
