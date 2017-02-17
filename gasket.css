@@ -68,10 +68,10 @@ body {
     text-align:center;
 }
 
-#drawbutton {
-    font-size:130%;
-    margin-left:36px;
-    margin-top:24pt;
+#letsGoParty {
+    padding: 6px;
+    border-radius: 6%;
+    margin-left:10px;
 }
 
 #erasebutton {

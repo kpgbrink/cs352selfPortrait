@@ -33,6 +33,8 @@ function getRndColorHex() {
 
 $(document).ready(function () { kenDoll.init(); });
 
+
+
 kenDoll.init = function () {
   kenDoll.canvas  = $('#canvas1')[0];
   kenDoll.cx = kenDoll.canvas.getContext('2d');	// get the drawing canvas
@@ -86,15 +88,33 @@ kenDoll.init = function () {
      kenDoll.mouseClick = true;
   });
     
+  
+  kenDoll.drawGlassesBool = false;
+  kenDoll.check = function () {
+      $('#messages').prepend("Toggle glasses.. ");
+      kenDoll.drawGlassesBool = !kenDoll.drawGlassesBool;
+  }
+  $('#checkbox').bind('click', kenDoll.check);
+    
   kenDoll.sunglasses = document.getElementById('sunglasses');
+    
+    
+  kenDoll.drawFogBool = false;
+  kenDoll.check2 = function () {
+      $('#messages').prepend("Toggle glasses.. ");
+      kenDoll.drawFogBool = !kenDoll.drawFogBool;
+  }
+  $('#checkbox2').bind('click', kenDoll.check2);
+    
 }
 
 
 
 kenDoll.draw = function(ev) {
     kenDoll.erase();
-    kenDoll.drawGlasses();
+    kenDoll.drawFog();
     kenDoll.drawHappiness();
+    kenDoll.drawGlasses();
     kenDoll.drawEyes();
     kenDoll.handleParty();
     kenDoll.mouseClick = false;
@@ -151,9 +171,7 @@ kenDoll.handleParty = function() {
 }
 
 kenDoll.partyBackground = function () {
-    console.log('background change');
     if (kenDoll.partyTimer % 50 == 0 ) {
-        console.log('yeay');
         var color = getRndColorHex();
         $('#messages').prepend("Change the party color to " + color + "... ");
         $('body').css('background-color', '#' + color);
@@ -233,5 +251,18 @@ kenDoll.slider = function(ev) {
 }
 
 kenDoll.drawGlasses = function() {
-    kenDoll.ctx.drawImage(kenDoll.sunglasses, 33, 71, 104, 124, 21, 20, 87, 104);
+    if (kenDoll.drawGlassesBool) {
+        kenDoll.cx.drawImage(kenDoll.sunglasses, kenDoll.canvas.width/2 - 70, 120, 160, 100);
+    }
+}
+
+kenDoll.drawFog = function() {
+    if (kenDoll.drawFogBool) {
+        kenDoll.cx.beginPath();
+        var gradient = kenDoll.cx.createLinearGradient(0, 100, 0, 0);
+        gradient.addColorStop(0, 'yellow');
+        gradient.addColorStop(1, 'red');
+        kenDoll.cx.fillStyle = gradient;
+        kenDoll.cx.fillRect(135, 40, 200, 100);
+    }
 }
