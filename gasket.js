@@ -1,10 +1,17 @@
 /*
- * kenDoll v2: draw a Sierpinski kenDoll by drawing lots of dots,
- * where each is the average of the previous and a random vertex
+ * kenDoll v2: draws a kenDoll
  * For CS352, Calvin College Computer Science
  *
  * Harry Plantinga -- January 2011
  */
+
+/** Requirements
+*   + use each of canvas primitives
+*      - square
+*
+*
+*
+*/
 
 var kenDoll = {};
 
@@ -37,7 +44,7 @@ kenDoll.init = function () {
    
     
   kenDoll.letsGoPartyAudioElement = document.createElement('audio');
-  kenDoll.letsGoPartyAudioElement.setAttribute('src', './letsGoParty.wav');
+  kenDoll.letsGoPartyAudioElement.setAttribute('src', './letsGoParty.mp3');
   
     
   kenDoll.cx.fillStyle = 'rgba(250,0,0,0.7)';
@@ -78,12 +85,15 @@ kenDoll.init = function () {
   $(kenDoll.canvas).click(function(e) {
      kenDoll.mouseClick = true;
   });
+    
+  kenDoll.sunglasses = document.getElementById('sunglasses');
 }
 
 
 
 kenDoll.draw = function(ev) {
     kenDoll.erase();
+    kenDoll.drawGlasses();
     kenDoll.drawHappiness();
     kenDoll.drawEyes();
     kenDoll.handleParty();
@@ -197,11 +207,22 @@ kenDoll.drawHappiness = function() {
     var addAngle = (Math.PI/2) * ((5000-kenDoll.happiness) / 5000);
     // first draw a smiley
     kenDoll.cx.beginPath();
-    kenDoll.cx.lineWidth = 8;
+    kenDoll.cx.strokeStyle = 'rgba(255,12,12,1)';
+    kenDoll.cx.lineWidth = 6;
     kenDoll.cx.arc(kenDoll.canvas.width / 2 + 12, 190, // position
                    50, // radius
                    0 + addAngle, // start angle
                    Math.PI - addAngle); // end angle
+    kenDoll.cx.stroke();
+    
+    kenDoll.cx.beginPath();
+    kenDoll.cx.strokeStyle = 'rgba(255,12,12,.4)';
+    kenDoll.cx.lineWidth = 10;
+    kenDoll.cx.arc(kenDoll.canvas.width / 2 + 12, 190, // position
+                   50, // radius
+                   0 + addAngle, // start angle
+                   Math.PI - addAngle); // end angle
+    
     kenDoll.cx.stroke();
 }
 
@@ -209,4 +230,8 @@ kenDoll.drawHappiness = function() {
 kenDoll.slider = function(ev) {
   
   $('#pointcount').text(kenDoll.happiness);
+}
+
+kenDoll.drawGlasses = function() {
+    kenDoll.ctx.drawImage(kenDoll.sunglasses, 33, 71, 104, 124, 21, 20, 87, 104);
 }

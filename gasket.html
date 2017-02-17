@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Ken the Beautiful</title>
-  <link rel="icon" href="./ken.jpg"/>
+  <link rel="icon" href="./ken.png"/>
   <link rel="stylesheet" type="text/css" href="gasket.css" />
 </head>
 <body>
   <div id="mainWindow">
-    <h3 class="titleBar">Ken the Beautiful</h3>
+    <h3 class="titleBar">Ken</h3>
       
       
 
@@ -21,7 +21,7 @@
       <button id="playGame" type="playGame">Play the Game</button>
     </div>
 
-    <canvas id="canvas1" width="450" height="342" style="background: url('./ken.jpg')">
+    <canvas id="canvas1" width="450" height="342" style="background: url('./ken.png')">
       <p>Your browser doesn't support the HTML5 canvas element.</p>
     </canvas>
   </div>
@@ -29,6 +29,11 @@
   <div id="messageWindow">
     <h3 class="titleBar">Messages</h3>
     <div id="messages"></div>
+  </div>
+    
+  <div style="display:none">
+  <img id="sunglasses" src="sunglasses.png"
+       width="300" height="227"/>  
   </div>
 
   <!-- javascript, loaded at the end to make the page appear faster -->
